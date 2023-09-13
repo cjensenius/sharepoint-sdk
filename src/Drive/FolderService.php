@@ -135,7 +135,7 @@ class FolderService
      */
     public function requestFolderMetadata(?string $folder = null, ?string $itemId = null, ?bool $children = false): ?array
     {
-        $url = $this->getFolderBaseUrl($folder, $itemId, $children ? "$expand=children" : "");
+        $url = $this->getFolderBaseUrl($folder, $itemId, $children ? '?$expand=children' : "");
 
         $response = $this->apiConnector->request('GET', $url);
 
