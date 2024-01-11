@@ -71,13 +71,27 @@ class DriveService
      * @return array
      * @throws Exception
      */
-    public function requestDrive(string $sharepointSiteId): array {
+    public function requestDrive(string $sharepointSiteId, string $sharepointDocumentLibrary = ''): array {
 
-        // /sites/{siteId}/drive
-        $url = sprintf('/v1.0/sites/%s/drive', $sharepointSiteId);
+        if($sharepointDocumentLibrary != '') {
+            // /sites/{siteId}/drives
+            $url = sprintf('/v1.0/sites/%s/drives', $sharepointSiteId);
+            $drives = $this->apiConnector->request('GET', $url);
+            if(isset($drives['value'])) {
+                foreach($drives['value'] as $drive) {
+                    if(urldecode($drive['name']) == $sharepointDocumentLibrary) {
+                        $response = $drive;
+                        break;
+                    }
+                }
+            }
+        } else {
+            // /sites/{siteId}/drive
+            $url = sprintf('/v1.0/sites/%s/drive', $sharepointSiteId);
 
 
-        $response =  $this->apiConnector->request('GET', $url);
+            $response =  $this->apiConnector->request('GET', $url);
+        }
 
 
         if(!isset($response['id'], $response['description'], $response['name'], $response['webUrl'], $response['owner'], $response['quota'])) {
