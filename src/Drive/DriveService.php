@@ -106,9 +106,9 @@ class DriveService
      * @return string
      * @throws Exception
      */
-    public function requestDriveId(string $sharepointSiteId): string {
+    public function requestDriveId(string $sharepointSiteId, string $sharepointDocumentLibrary = ''): string {
 
-        $drive = $this->requestDrive($sharepointSiteId);
+        $drive = $this->requestDrive($sharepointSiteId, $sharepointDocumentLibrary);
 
         if(!isset($drive['id'])) {
             throw new \Exception('Microsoft SP Drive Request: Cannot parse the body of the sharepoint drive request. '.__FUNCTION__, 2121);
