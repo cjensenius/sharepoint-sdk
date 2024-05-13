@@ -119,6 +119,31 @@ class DriveService
 
     /**
      * @param string $driveId
+     * @param string|null $token - 2021-09-29T20%3A00%3A00Z
+     * @return array
+     * @throws Exception
+     */
+    public function requestDelta(?string $token = null): ?array
+    {
+        if ($token === null) {
+            throw new \Exception('Microsoft SP Drive Request: Not all the parameters are correctly set. ' . __FUNCTION__, 2131);
+        }
+
+        // /drives/{drive-id}/root/delta?token={datetime}
+        // https://learn.microsoft.com/en-us/graph/api/driveitem-delta?view=graph-rest-1.0&tabs=php#example-4-retrieving-delta-results-using-a-timestamp
+        $url = sprintf('/v1.0/drives/%s/root/delta?token=%s', $this->getDriveId(), $token);
+
+        $response = $this->apiConnector->request('GET', $url);
+
+        if ( ! isset($response['@odata.deltaLink'], $response['value'])) {
+            throw new \Exception('Microsoft SP Drive Request: Cannot parse the body of the sharepoint drive request. ' . __FUNCTION__, 2132);
+        }
+
+        return $response;
+    }    
+
+    /**
+     * @param string $driveId
      * @param string|null $path
      * @param string|null $itemId
      * @return array
