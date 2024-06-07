@@ -135,7 +135,7 @@ class DriveService
 
         $response = $this->apiConnector->request('GET', $url);
 
-        if ( ! isset($response['@odata.deltaLink'], $response['value'])) {
+        if ( ! isset($response['value'])) {
             throw new \Exception('Microsoft SP Drive Request: Cannot parse the body of the sharepoint drive request. ' . __FUNCTION__, 2132);
         }
 
