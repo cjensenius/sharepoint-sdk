@@ -128,18 +128,33 @@ class DriveService
         if ($token === null) {
             throw new \Exception('Microsoft SP Drive Request: Not all the parameters are correctly set. ' . __FUNCTION__, 2131);
         }
+        $values = [];
 
         // /drives/{drive-id}/root/delta?token={datetime}
         // https://learn.microsoft.com/en-us/graph/api/driveitem-delta?view=graph-rest-1.0&tabs=php#example-4-retrieving-delta-results-using-a-timestamp
         $url = sprintf('/v1.0/drives/%s/root/delta?token=%s', $this->getDriveId(), $token);
 
+        $i = 0;
         $response = $this->apiConnector->request('GET', $url);
+        while($i++ < 100 && isset($response['@odata.nextLink'])) {
+            if ( ! isset($response['value'])) {
+                throw new \Exception('Microsoft SP Drive Request: Cannot parse the body of the sharepoint drive request. ' . __FUNCTION__, 2132);
+            }
 
+            $values = [...$values, ...$response['value']];
+            $response = $this->apiConnector->request('GET', $response['@odata.nextLink']);
+        }
+        
         if ( ! isset($response['value'])) {
             throw new \Exception('Microsoft SP Drive Request: Cannot parse the body of the sharepoint drive request. ' . __FUNCTION__, 2132);
         }
 
-        return $response;
+        $values = [...$values, ...$response['value']];
+
+        return [
+            ...$response,
+            'value' => $values
+        ];
     }    
 
     /**
